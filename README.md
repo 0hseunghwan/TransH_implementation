@@ -13,7 +13,7 @@ TransH 논문 (Wang, Zhang, Feng, Chen, *"Knowledge Graph Embedding by Translati
 
 ```
 .
-├── TransH_LinkPrediction.ipynb   # 메인 노트북
+├── TransH.ipynb   # 메인 노트북
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -32,7 +32,7 @@ GPU(CUDA)가 있으면 자동으로 사용. Google Colab에서 실행할 경우
 
 ### 2. 노트북 실행
 
-`TransH_LinkPrediction.ipynb`를 위에서부터 순서대로 실행하세요.
+`TransH.ipynb` 순서대로 실행
 
 1. **환경 설정** — torch 설치 및 device 확인
 2. **데이터셋 다운로드** — FB15k-237 (`train.txt`, `valid.txt`, `test.txt`)를
