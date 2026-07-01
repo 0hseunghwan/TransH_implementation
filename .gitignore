@@ -1,0 +1,23 @@
+# 데이터셋 (다운로드로 재생성됨)
+fb15k237/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# 모델 체크포인트 / 로그
+*.pt
+*.pth
+*.ckpt
+logs/
+runs/
+
+# OS / 에디터
+.DS_Store
+.idea/
+.vscode/
