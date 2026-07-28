@@ -6,7 +6,7 @@ TransH 논문 (Wang, Zhang, Feng, Chen, *"Knowledge Graph Embedding by Translati
 
 - 각 relation마다 초평면(법선벡터 `w_r`)과 그 위에서의 translation `d_r`을 학습
 - entity를 관계별 초평면에 투영(projection)한 뒤 TransE와 동일한 방식으로 스코어링
-- soft constraint(엔티티 노름 제한, `w_r`-`d_r` 직교 제약)를 loss에 정규화 항으로 추가
+- soft constraint(엔티티 norm 제한, `w_r`-`d_r` 직교 제약)를 loss에 정규화 항으로 추가
 - 평가 지표: Mean Rank(MR), MRR, Hits@10 (raw / filtered)
 
 ## 파일 구성
