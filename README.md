@@ -1,73 +1,74 @@
 # TransH Link Prediction (FB15k-237)
 
-TransH 논문 (Wang, Zhang, Feng, Chen, *"Knowledge Graph Embedding by Translating on Hyperplanes"*, AAAI 2014)의 세 가지 실험 중 하나인 Link prediction 실험을 PyTorch로 재현하는 코드입니다.
+This is a PyTorch reimplementation of the Link Prediction experiment from the TransH paper (Wang, Zhang, Feng, Chen, *"Knowledge Graph Embedding by Translating on Hyperplanes"*, AAAI 2014), one of three experiments described in the paper.
 
-## 구현 내용
+## What's Implemented
 
-- 각 relation마다 초평면(법선벡터 `w_r`)과 그 위에서의 translation `d_r`을 학습
-- entity를 관계별 초평면에 투영(projection)한 뒤 TransE와 동일한 방식으로 스코어링
-- soft constraint(엔티티 norm 제한, `w_r`-`d_r` 직교 제약)를 loss에 정규화 항으로 추가
-- 평가 지표: Mean Rank(MR), MRR, Hits@10 (raw / filtered)
+- Learns a hyperplane (normal vector `w_r`) and a translation `d_r` on that hyperplane for each relation
+- Projects entities onto the relation-specific hyperplane, then scores them the same way as TransE
+- Adds soft constraints (entity norm limit, `w_r`-`d_r` orthogonality) to the loss as regularization terms
+- Evaluation metrics: Mean Rank (MR), MRR, Hits@10 (raw / filtered)
 
-## 파일 구성
+## File Structure
 
 ```
 .
-├── TransH.ipynb   # 메인 노트북
+├── TransH.ipynb   # main notebook
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-## 실행 방법
+## How to Run
 
-### 1. 환경 설정
+### 1. Environment Setup
 
 ```bash
 pip install -r requirements.txt
 ```
 
-GPU(CUDA)가 있으면 자동으로 사용. Google Colab에서 실행할 경우
-`런타임 > 런타임 유형 변경 > GPU`로 설정하는 것을 권장
+GPU (CUDA) is used automatically if available. If running on Google Colab,
+it's recommended to set `Runtime > Change runtime type > GPU`.
 
-### 2. 노트북 실행
+### 2. Run the Notebook
 
-`TransH.ipynb` 순서대로 실행
+Run `TransH.ipynb` in order:
 
-1. **환경 설정** — torch 설치 및 device 확인
-2. **데이터셋 다운로드** — FB15k-237 (`train.txt`, `valid.txt`, `test.txt`)를
+1. **Environment setup** — install torch and check device
+2. **Dataset download** — automatically downloads FB15k-237 (`train.txt`, `valid.txt`, `test.txt`) from the
    [dataset_FB15k-237](https://github.com/DeepGraphLearning/KnowledgeGraphEmbedding/raw/master/data/FB15k-237)
-   저장소에서 자동 다운로드하여 `fb15k237/` 디렉토리에 저장
-3. **데이터 로딩 및 인덱싱** — entity/relation을 정수 ID로 매핑
-4. **TransH 모델 구현** — hyperplane 투영, score function, soft constraints 포함
-5. **Negative sampling** — head 또는 tail을 무작위로 교체 (uniform)
+   repository and stores it in the `fb15k237/` directory
+3. **Data loading and indexing** — map entities/relations to integer IDs
+4. **TransH model implementation** — including hyperplane projection, score function, and soft constraints
+5. **Negative sampling** — randomly replace head or tail (uniform)
 6. **Training** — margin ranking loss + SGD
-7. **Training loss 시각화**
+7. **Training loss visualization**
 8. **Evaluation** — MR / MRR / Hits@10 (raw, filtered)
 
-## 주요 하이퍼파라미터
+## Key Hyperparameters
 
-기본값은 빠른 실습을 위한 설정이며, 논문에서 사용된 하이퍼파라미터 값과 다를 수 있음
+The defaults are set for quick experimentation and may differ from the hyperparameter values used in the paper.
 
-| 파라미터 | 기본값 | 설명 |
+| Parameter | Default | Description |
 |---|---|---|
-| `DIM` | 100 | 임베딩 차원 |
-| `BATCH_SIZE` | 1024 | 배치 크기 |
-| `EPOCHS` | 20 | 논문 재현에는 500 epoch 이상 권장 |
-| `LR` | 0.01 | SGD 학습률 |
-| `MARGIN` | 1.0 | margin ranking loss의 margin |
-| `C` | 0.25 | soft constraint 가중치 |
+| `DIM` | 100 | Embedding dimension |
+| `BATCH_SIZE` | 1024 | Batch size |
+| `EPOCHS` | 20 | 500+ epochs recommended to reproduce the paper's results |
+| `LR` | 0.01 | SGD learning rate |
+| `MARGIN` | 1.0 | Margin for margin ranking loss |
+| `C` | 0.25 | Soft constraint weight |
 
 
-## 참고 / 튜닝 포인트
+## Notes / Tuning Tips
 
-- `EPOCHS`, `DIM`, `LR`, `MARGIN`, `C`(soft constraint 가중치)는 TransE / TransH 논문 참고
-- 평가(`evaluate`)에서 `max_test`를 늘리면(예: `None`으로 전체 test set) 논문과 동일한 전체 평가가 되지만,
-  entity 수 × test triple 수만큼 forward pass가 필요해 CPU에서는 매우 느림. GPU 런타임 사용 권장
-  (`런타임 > 런타임 유형 변경 > GPU`)
-- negative sampling은 현재 uniform random 사용. 논문의 "bern" (relation의 하나의 head/tail 의 평균 tail/head 개수에 따라 확률적으로 head/tail 교체) 방식으로 바꾸면 성능이 더 오를 수도 있음.
+- Refer to the TransE / TransH papers for `EPOCHS`, `DIM`, `LR`, `MARGIN`, and `C` (soft constraint weight)
+- Increasing `max_test` in `evaluate` (e.g., to `None` for the full test set) reproduces the paper's full evaluation,
+  but requires a forward pass for every entity × test triple combination, which is very slow on CPU. Using a GPU runtime is recommended
+  (`Runtime > Change runtime type > GPU`)
+- Negative sampling currently uses uniform random. Switching to the paper's "bern" strategy
+  (probabilistically replacing head/tail based on the average number of tails/heads per head/tail for a relation) may improve performance further.
 
-## 참고 문헌
+## References
 
 Wang, Z., Zhang, J., Feng, J., & Chen, Z. (2014). *Knowledge Graph Embedding by Translating on Hyperplanes.*
 Proceedings of the AAAI Conference on Artificial Intelligence, 28(1).
